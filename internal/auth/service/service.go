@@ -9,7 +9,7 @@ import (
 )
 
 type Service interface {
-	Create(ctx context.Context, user *data.UserModel) (int64, error)
+	Create(ctx context.Context, user *data.UserModel) (int64, bool, error)
 }
 
 type service struct {
@@ -24,6 +24,22 @@ func NewService(log *slog.Logger, repository repository.Repository) Service {
 	}
 }
 
-func (s *service) Create(ctx context.Context, user *data.UserModel) (int64, error) {
-	return s.repository.Create(ctx, user)
+func (s *service) Create(ctx context.Context, user *data.UserModel) (int64, bool, error) {
+	isNewUser := true
+
+	user, err := s.repository.Get(ctx, user.ChatID)
+	if err != nil {
+		return 0, true, err
+	}
+
+	if user != nil {
+		isNewUser = false
+	}
+
+	var id int64
+	if isNewUser {
+		id, err = s.repository.Create(ctx, user)
+	}
+
+	return id, isNewUser, err
 }

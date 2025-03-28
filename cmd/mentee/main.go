@@ -58,6 +58,12 @@ func main() {
 	}
 
 	b.Handle("/start", authHandler.HandleStart)
+	b.Handle(&authhandler.BtnAbout, authHandler.HandleAbout)
+	b.Handle(&authhandler.BtnWho, authHandler.HandleWho)
+	b.Handle(&authhandler.BtnMentor, authHandler.HandleMentor)
+	b.Handle(&authhandler.BtnStart, authHandler.HandleListMentor)
+	b.Handle(&authhandler.BtnReview, authHandler.HandleReview)
+	b.Handle(&authhandler.BtnHelp, authHandler.HandleHelp)
 
 	b.Start()
 }

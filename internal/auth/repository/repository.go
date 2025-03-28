@@ -10,6 +10,7 @@ import (
 
 type Repository interface {
 	Create(ctx context.Context, user *data.UserModel) (int64, error)
+	Get(ctx context.Context, chatID string) (*data.UserModel, error)
 }
 
 type repository struct {
@@ -56,4 +57,31 @@ func (r *repository) Create(ctx context.Context, user *data.UserModel) (int64, e
 	}
 
 	return id, nil
+}
+
+func (r *repository) Get(ctx context.Context, chatID string) (*data.UserModel, error) {
+	query :=
+	`
+        SELECT id, first_name, last_name, phone, chat_id, username, role, description
+        FROM users
+        WHERE chat_id = $1
+    `
+	
+	user := &data.UserModel{}
+	
+	err := r.db.QueryRow(query, chatID).Scan(
+		&user.ID,
+		&user.FirstName,
+		&user.LastName,
+		&user.Phone,
+		&user.ChatID,
+		&user.UserName,
+		&user.Role,
+		&user.Description,
+	)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
+
+	return user, nil
 }
