@@ -10,10 +10,13 @@ import (
 	authhandler "github.com/aidosgal/mentor/internal/auth/handler"
 	authrepository "github.com/aidosgal/mentor/internal/auth/repository"
 	authservice "github.com/aidosgal/mentor/internal/auth/service"
+	categoryrepository "github.com/aidosgal/mentor/internal/category/repository"
+	categoryservice "github.com/aidosgal/mentor/internal/category/service"
+	categoryhandler "github.com/aidosgal/mentor/internal/category/handler"
 	"github.com/aidosgal/mentor/internal/config"
-	
-	tele "gopkg.in/telebot.v4"
+
 	_ "github.com/lib/pq"
+	tele "gopkg.in/telebot.v4"
 )
 
 func main() {
@@ -47,6 +50,10 @@ func main() {
 	authService := authservice.NewService(log, authRepository)
 	authHandler := authhandler.NewHandler(log , authService)
 
+	categoryRepository := categoryrepository.NewRepository(log, db)
+	categoryService := categoryservice.NewService(log, categoryRepository)
+	categoryHandler := categoryhandler.NewHandler(log, categoryService)
+
 	pref := tele.Settings{
 		Token:  cfg.Telegram.Api,
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
@@ -61,9 +68,10 @@ func main() {
 	b.Handle(&authhandler.BtnAbout, authHandler.HandleAbout)
 	b.Handle(&authhandler.BtnWho, authHandler.HandleWho)
 	b.Handle(&authhandler.BtnMentor, authHandler.HandleMentor)
-	b.Handle(&authhandler.BtnStart, authHandler.HandleListMentor)
 	b.Handle(&authhandler.BtnReview, authHandler.HandleReview)
 	b.Handle(&authhandler.BtnHelp, authHandler.HandleHelp)
+
+	b.Handle(&authhandler.BtnStart, categoryHandler.HandleList)
 
 	b.Start()
 }
