@@ -8,11 +8,21 @@ import (
 )
 
 type Config struct {
-	Telegram Telegram `yaml:"telegram"`
+	Telegram Telegram       `yaml:"telegram"`
+	Database DatabaseConfig `yaml:"database"`
 }
 
 type Telegram struct {
 	Api string `yaml:"api"`
+}
+
+type DatabaseConfig struct {
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	Host     string `yaml:"host"`
+	Name     string `yaml:"name"`
+	Port     int    `yaml:"port"`
+	SSLMode  string `yaml:"sslmode"`
 }
 
 func MustLoad() *Config {
