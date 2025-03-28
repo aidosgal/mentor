@@ -16,7 +16,7 @@ type Handler interface {
 	HandleAbout(c tele.Context) error
 	HandleWho(c tele.Context) error
 	HandleMentor(c tele.Context) error
-	HandleListMentor(c tele.Context) error
+	HandleListMentor(c tele.Context, category string) error
 	HandleHelp(c tele.Context) error
 	HandleReview(c tele.Context) error
 }
@@ -62,7 +62,7 @@ func (h *handler) HandleStart(c tele.Context) error {
 		"method", "HandleStart",
 		"userName", userName,
 	)
-	firstName := c.Message().Chat.FirstName
+	firstName := c.Message().Chat.FirstNamen
 	lastName := c.Message().Chat.LastName
 	chatID := c.Message().Chat.ID
 
@@ -135,7 +135,7 @@ func (h *handler) HandleMentor(c tele.Context) error {
 	return c.Send("Ага, щас")
 }
 
-func (h *handler) HandleListMentor(c tele.Context) error {
+func (h *handler) HandleListMentor(c tele.Context, category string) error {
 	return c.Send("ищи сам")
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log/slog"
@@ -10,9 +11,9 @@ import (
 	authhandler "github.com/aidosgal/mentor/internal/auth/handler"
 	authrepository "github.com/aidosgal/mentor/internal/auth/repository"
 	authservice "github.com/aidosgal/mentor/internal/auth/service"
+	categoryhandler "github.com/aidosgal/mentor/internal/category/handler"
 	categoryrepository "github.com/aidosgal/mentor/internal/category/repository"
 	categoryservice "github.com/aidosgal/mentor/internal/category/service"
-	categoryhandler "github.com/aidosgal/mentor/internal/category/handler"
 	"github.com/aidosgal/mentor/internal/config"
 
 	_ "github.com/lib/pq"
@@ -72,6 +73,19 @@ func main() {
 	b.Handle(&authhandler.BtnHelp, authHandler.HandleHelp)
 
 	b.Handle(&authhandler.BtnStart, categoryHandler.HandleList)
+	
+	ctx := context.Background()
+	if err := categoryHandler.InitializeCategories(ctx); err != nil {
+		return
+	}
+	
+	for name, btn := range categoryhandler.CategoryButtons {
+		categoryName := name
+
+		b.Handle(&btn, func(c tele.Context) error {
+			return authHandler.HandleListMentor(c, categoryName)
+		})
+	}
 
 	b.Start()
 }
