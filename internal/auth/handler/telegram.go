@@ -39,11 +39,14 @@ var (
 
 	BtnHelp   = menu.Text("Помощь")
 	BtnStart  = menu.Text("Найти Ментора")
+    BtnReturn = menu.Text("Изменить область")
 	BtnReview = menu.Text("Оставить отзыв ментору")
 	
     BtnAbout = inlineMenu.Data("Про нас", "about_us")
     BtnWho = inlineMenu.Data("Кому подходит?", "for_who")
     BtnMentor = inlineMenu.Data("Стать ментором", "become_mentor")
+	BtnNext = inlineMenu.Data("Следующий", "next")
+	BtnPrev = inlineMenu.Data("Предыдущий", "prev")
 )
 
 func (h *handler) HandleStart(c tele.Context) error {
@@ -62,7 +65,7 @@ func (h *handler) HandleStart(c tele.Context) error {
 		"method", "HandleStart",
 		"userName", userName,
 	)
-	firstName := c.Message().Chat.FirstNamen
+	firstName := c.Message().Chat.FirstName
 	lastName := c.Message().Chat.LastName
 	chatID := c.Message().Chat.ID
 
@@ -99,7 +102,7 @@ func (h *handler) HandleStart(c tele.Context) error {
 	}
 
 	welcomeText = fmt.Sprintf(
-        `Саламалейкум, %s! 👋
+        `Добро пожаловать, %s! 👋
 
 Представляем вам mitti – ваш персональный инструмент карьерного роста!
 
@@ -115,7 +118,11 @@ func (h *handler) HandleStart(c tele.Context) error {
 		Caption: welcomeText,
 	}
 
-	err = c.Send(heroImage, inlineMenu, menu)
+	err = c.Send(heroImage, inlineMenu)
+	if err != nil {
+		return err
+	}
+	err = c.Send(".", menu)
 	if err != nil {
 		return err
 	}
@@ -136,7 +143,46 @@ func (h *handler) HandleMentor(c tele.Context) error {
 }
 
 func (h *handler) HandleListMentor(c tele.Context, category string) error {
-	return c.Send("ищи сам")
+	profileText := `🏆 Галимжан Айдос - Senior Software Engineer
+
+Профессиональный опыт:
+
+• Google (2018-2023): Senior Backend Engineer
+  - Разработка масштабируемых облачных сервисов
+  - Работа над ключевыми проектами Google Cloud Platform
+
+Стоимость услуг:
+• Разовая консультация (1 час): 15 000 ₸
+• Пакет из 5 консультаций: 65 000 ₸
+• Подготовка к интервью (2 недели): 30 000 ₸
+
+Связь: @bizzarchikk
+`
+
+	profileImage := &tele.Photo{
+		File: tele.FromURL("https://img.freepik.com/free-photo/close-up-upset-american-black-person_23-2148749582.jpg"),
+		Caption: profileText,
+	}
+
+	inlineMenu.Inline(
+		inlineMenu.Row(BtnPrev, BtnNext),
+	)
+		
+	menu.Reply(
+		menu.Row(BtnReturn, BtnHelp),
+		menu.Row(BtnReview),
+	)
+	
+	err := c.Send(profileImage, inlineMenu)
+	if err != nil {
+		return err
+	}
+	err = c.Send(".", menu)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (h *handler) HandleHelp(c tele.Context) error {

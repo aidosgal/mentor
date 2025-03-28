@@ -73,6 +73,7 @@ func main() {
 	b.Handle(&authhandler.BtnHelp, authHandler.HandleHelp)
 
 	b.Handle(&authhandler.BtnStart, categoryHandler.HandleList)
+	b.Handle(&authhandler.BtnReturn, categoryHandler.HandleList)
 	
 	ctx := context.Background()
 	if err := categoryHandler.InitializeCategories(ctx); err != nil {
